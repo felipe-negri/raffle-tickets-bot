@@ -1,0 +1,26 @@
+{
+  "name": "raffle-tickets-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "bot": "micro-bot -t 1327468811:AAFVdQ_Dg4J2qcGAsPQ5cfvrFUdZmTi94KA index.js",
+    "start": "node index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/felipe-negri/raffle-tickets-bot.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/felipe-negri/raffle-tickets-bot/issues"
+  },
+  "homepage": "https://github.com/felipe-negri/raffle-tickets-bot#readme",
+  "dependencies": {
+    "micro-bot": "^2.5.3",
+    "mongodb": "^3.5.9",
+    "telegraf": "^3.38.0"
+  }
+}
