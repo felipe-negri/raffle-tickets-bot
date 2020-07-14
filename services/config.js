@@ -14,6 +14,9 @@ function mountConfig() {
     },
     bot:{
       id: process.env.botId
+    },
+    cron: {
+      "deleteCron": process.env.deleteCron
     }
   }
 
