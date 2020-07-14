@@ -153,7 +153,7 @@ module.exports = {
     await banco.fecharConexaoMongo(mongoDb);
   },
   async start(ctx){
-    await ctx.replyWithVideo(config.startVideoId);
+    await ctx.replyWithAnimation(config.startVideoId);
    },
   dropTemp,
   seeRaffle
