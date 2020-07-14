@@ -22,7 +22,8 @@ bot.command('create', (ctx) => ctx.scene.enter('raffle'));
 bot.command('finish', finishMessage);
 bot.command('list', listRaffles);
 bot.command('delete', deleteMessage)
-// bot.command('start', start);
+bot.command('start', start);
+bot.on(`message`, (ctx) => { console.log(JSON.stringify(ctx.message))})
 bot.on('callback_query', callbackMiddleware);
 bot.launch()
 
