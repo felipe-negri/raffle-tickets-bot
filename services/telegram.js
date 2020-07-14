@@ -181,6 +181,7 @@ async function result(ctx) {
   if(raffle.participants.length > 0) {
     const randomParticipant = raffle.participants[Math.floor(Math.random() * raffle.participants.length)];
     await ctx.telegram.sendMessage(raffle.channel.id,`${raffle.title}\nWinner @${randomParticipant}`);
+    await ctx.reply('Winner Send To The Channel')
     await raffles.updateOne({_id: ObjectID(raffle._id)},{$set:{winner:randomParticipant}})
   } else {
     ctx.reply(`No Participants`)
