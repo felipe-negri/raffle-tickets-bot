@@ -17,7 +17,8 @@ function mountConfig() {
     },
     cron: {
       "deleteCron": process.env.deleteCron
-    }
+    },
+    startVideoId: process.env.startVideoId
   }
 
 }
