@@ -1,11 +1,10 @@
 const cron = require('node-cron');
 console.log('CRONS ATIVADOS');
 
-const config = require('./services/config').mountConfig();
 const banco = require('./services/banco');
-const {  deleteCron } = config.cron;
 
-cron.schedule(deleteCron, async () => {
+cron.schedule('0 1 * * 0', async () => {
+    const config = require('./services/config').mountConfig();
     const mongoDb = await banco.abrirConexaoMongo(config);
     const db = await mongoDb.db(config.mongo.dbName);
     await banco.delFinished(db);
