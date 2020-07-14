@@ -1,4 +1,5 @@
 async function main() {
+    console.log(`BOT START`)
     const config = require('./services/config').mountConfig();
     const {enterMessage, dropTemp, createRaffle, callbackMiddleware, listRaffles, deleteMessage, finishMessage } = require('./services/telegram');
     
