@@ -10,7 +10,11 @@ module.exports = {
     if(ctx.update.message && ctx.update.message.reply_to_message) {
       const replyMessageId = ctx.update.message.reply_to_message.message_id;
       const message =  ctx.update.message.text;
+      const caption = ctx.update.message.caption;
+      const photo = ctx.update.message.photo;
       const messageId = ctx.update.message.message_id;
+      const video = ctx.update.message.video
+      const document = ctx.update.message.document && ctx.update.message.document.mime_type.includes(`video`) ? ctx.update.message.document: undefined;
 
       const mongoDb = await banco.abrirConexaoMongo(config);
       const db = mongoDb.db(config.mongo.dbName);
@@ -23,8 +27,11 @@ module.exports = {
       switch(stage) {
         case 1:
           const r1 = await ctx.reply('Raffle Title Successfully Registered :3\nNow reply with the channel with @');
-          temporario.titulo = message;
+          message ? temporario.titulo = message: caption ? temporario.titulo = caption : '';
           temporario.user = {id: ctx.update.message.from.id, username:'@' + ctx.update.message.from.username }
+          photo && photo.length > 0 ? temporario.photo = photo : '';
+          document ? temporario.document = document : ''
+          video ? temporario.video = video : ''
           temporario.ids.push(r1.message_id);
           console.log(temporario.ids)
           temporario.stage = 2;
@@ -34,17 +41,46 @@ module.exports = {
         break;
         case 2:
           if(message.includes('@')) {
-            const r2 = await ctx.reply('Channel Registred Successful :3\nSending Raffle...');
-            const canal = message;
-            const titulo = temporario.titulo;
-            const options = { reply_markup: { inline_keyboard: [[{text:'Join', callback_data: `join`}]], resize_keyboard:true}};
-            const raffle = await ctx.telegram.sendMessage(canal, titulo, options);
-            const insert = await raffles.insertOne({user: temporario.user, message: {id: raffle.message_id}, channel: {id: raffle.chat.id, nome: canal}, title: titulo, participants:[]});
-            if(insert.insertedCount === 1) {
-              ctx.reply('Raffle Send Successful');
-              await banco.delTemp(db, temporario);
-            } else {
-              ctx.reply(`Error to Send The Raffle`)
+            try {
+              const r2 = await ctx.reply('Channel Registred Successful :3\nSending Raffle...');
+              let raffle;
+              const canal = message;
+              const titulo = temporario.titulo;
+              const photos = temporario.photo;
+              const video = temporario.video;
+              const document = temporario.document;
+
+              const options = { reply_markup: { inline_keyboard: [[{text:'Join', callback_data: `join`}]], resize_keyboard:true}};
+              
+              
+              if(photos) {
+                options.caption = titulo;
+                raffle = await ctx.telegram.sendPhoto(canal, photos[0].file_id, options);
+              } else if (document) {
+                options.caption = titulo;
+                raffle = await ctx.telegram.sendAnimation(canal, document.file_id, options);
+              } else if(video) {
+                options.caption = titulo;
+                raffle = await ctx.telegram.sendVideo(canal, video.file_id, options);
+              } else {
+                raffle = await ctx.telegram.sendMessage(canal, titulo, options);
+              }
+              
+              const insert = await raffles.insertOne({user: temporario.user, message: {id: raffle.message_id}, channel: {id: raffle.chat.id, nome: canal}, title: titulo, participants:[]});
+              if(raffle.message_id && insert.insertedCount === 1) {
+                ctx.reply('Raffle Send Successful');
+                await banco.delTemp(db, temporario);
+                ctx.scene.leave()
+              } else {
+                ctx.reply(`Error to Send The Raffle, try Again`)
+                ctx.scene.leave()
+              }
+            } catch (error) {
+              if(error.message.includes('chat not found')) {
+                ctx.reply(`Channel not Found`)
+              }
+              ctx.scene.leave()
+              console.log(error.message)
             }
           } else {
             const reply = await ctx.reply('You Forget @ on user Channel');
@@ -59,12 +95,7 @@ module.exports = {
   
       await banco.fecharConexaoMongo(mongoDb);
     } else {
-      const replyMiss = await ctx.reply('You forgot to reply to the message 🙄');
-      temporario.titulo = message;
-      temporario.ids.push(replyMiss.message_id);
-      console.log(temporario.ids)
-      await banco.atualizarTemp(temporario, db);
-      await banco.fecharConexaoMongo(mongoDb);
+      await ctx.reply('You forgot to reply to the message 🙄');
     }
 
   },

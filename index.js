@@ -23,6 +23,10 @@ bot.command('finish', finishMessage);
 bot.command('list', listRaffles);
 bot.command('delete', deleteMessage)
 bot.command('start', start);
+// bot.on('message',(ctx) => {
+//     ctx.update
+//     console.log()
+// })
 bot.on('callback_query', callbackMiddleware);
 bot.launch()
 
